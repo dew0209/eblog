@@ -1,6 +1,6 @@
 <#include "/inc/layout.ftl" />
 
-<@loyout "我的主页">
+<@layout "我的主页">
   <div class="fly-header layui-bg-black">
     <div class="layui-container">
       <a class="fly-logo" href="/">
@@ -28,11 +28,11 @@
             <img src="https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
           </a>
           <dl class="layui-nav-child">
-            <dd><a href="set.ftl"><i class="layui-icon">&#xe620;</i>基本设置</a></dd>
-            <dd><a href="message.ftl"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息</a></dd>
-            <dd><a href="home.ftl"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a></dd>
+            <dd><a href="/user/set"><i class="layui-icon">&#xe620;</i>基本设置</a></dd>
+            <dd><a href="/user/mess"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息</a></dd>
+            <dd><a href="/user/home"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a></dd>
             <hr style="margin: 5px 0;">
-            <dd><a href="" style="text-align: center;">退出</a></dd>
+            <dd><a href="/user/logout" style="text-align: center;">退出</a></dd>
           </dl>
         </li>
       </ul>
@@ -163,4 +163,5 @@ full: true
   <script>
   layui.cache.page = 'user';
   </script>
-</@loyout>
+  <script src="/res/mods/user.js"></script>
+</@layout>

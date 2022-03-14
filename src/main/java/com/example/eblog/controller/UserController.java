@@ -1,12 +1,15 @@
 package com.example.eblog.controller;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.example.eblog.common.lang.Result;
 import com.example.eblog.entity.MPost;
 import com.example.eblog.entity.MUser;
+import com.example.eblog.entity.MUserMessage;
 import com.example.eblog.shiro.AccountProfile;
 import com.example.eblog.util.UploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class UserController extends BaseController {
@@ -94,5 +98,58 @@ public class UserController extends BaseController {
 
     }
 
+    @GetMapping("/user/index")
+    public String index(){
+
+        return "/user/index";
+    }
+
+    @ResponseBody
+    @GetMapping("/user/public")
+    public Result userPublic(){
+        IPage page = postService.page(getPage(), new QueryWrapper<MPost>()
+                .eq("user_id", getProFileId())
+                .orderByDesc("created")
+        );
+        return Result.success(page);
+    }
+
+    @ResponseBody
+    @GetMapping("/user/collection")
+    public Result collection(){
+        IPage page = postService.page(getPage(), new QueryWrapper<MPost>()
+                .inSql("id","select post_id from m_user_collection where user_id = " + getProFileId())
+        );
+        return Result.success(page);
+    }
+    @GetMapping("/user/mess")
+    public String mess(){
+        IPage page = messageService.paging(getPage(), new QueryWrapper<MUserMessage>()
+                .eq("to_user_id", getProFileId())
+                .orderByDesc("created")
+        );
+        req.setAttribute("pageData",page);
+        return "/user/mess";
+    }
+    @ResponseBody
+    @RequestMapping("/msg/remove")
+    public Result msgRemove(Long id,@RequestParam(defaultValue = "false") Boolean all){
+        boolean remove = messageService.remove(new QueryWrapper<MUserMessage>()
+                .eq("to_user_id", getProFileId())
+                .eq(!all, "id", id)
+        );
+
+        return remove ? Result.success(null) : Result.fail("删除失败");
+    }
+
+    @ResponseBody
+    @RequestMapping("/msg/nums/")
+    public Map msgNums(){
+        int count = messageService.count(new QueryWrapper<MUserMessage>()
+                .eq("to_user_id", getProFileId())
+                .eq("status","0")
+        );
+        return MapUtil.builder("status",0).put("count",count).build();
+    }
 
 }

@@ -47,5 +47,5 @@ public class MUserMessage extends BaseEntity {
      */
     private Integer type;
 
-
+    private Integer status;
 }
