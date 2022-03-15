@@ -548,12 +548,14 @@ layui.define(['layer', 'laytpl', 'form', 'element', 'upload', 'util'], function(
 
   //表单提交
   form.on('submit(*)', function(data){
+    //alert(222);
     var action = $(data.form).attr('action'), button = $(data.elem);
     fly.json(action, data.field, function(res){
       var end = function(){
         if(res.action){
           location.href = res.action;
         }
+        //alert(111);
         if(button.attr('reload')){
           location.reload();
         }

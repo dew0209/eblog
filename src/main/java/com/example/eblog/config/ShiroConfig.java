@@ -1,6 +1,8 @@
 package com.example.eblog.config;
 
+import cn.hutool.core.map.MapUtil;
 import com.example.eblog.shiro.AccountRealm;
+import com.example.eblog.shiro.AuthFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -38,8 +40,16 @@ public class ShiroConfig {
         hashMap.put("/user/home", "authc");
         hashMap.put("/user/set", "authc");
         hashMap.put("/user/upload", "authc");
+        filterFactoryBean.setFilters(MapUtil.of("auth",authFilter()));
+        hashMap.put("/collection/find", "auth");
+        hashMap.put("/collection/add", "auth");
+        hashMap.put("/collection/remove", "auth");
         filterFactoryBean.setFilterChainDefinitionMap(hashMap);
 
         return filterFactoryBean;
+    }
+    @Bean
+    public AuthFilter authFilter(){
+        return new AuthFilter();
     }
 }

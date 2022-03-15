@@ -13,7 +13,7 @@
             <#if post.level gt 0><span class="layui-badge layui-bg-black">置顶</span></#if>
             <#if post.recommend><span class="layui-badge layui-bg-red">精帖</span></#if>
 
-            <div class="fly-admin-box" data-id="123">
+            <div class="fly-admin-box" data-id="${post.id}">
               <span class="layui-btn layui-btn-xs jie-admin" type="del">删除</span>
 
               <span class="layui-btn layui-btn-xs jie-admin" type="set" field="stick" rank="1">置顶</span>
@@ -38,7 +38,7 @@
               <span>${timeAgo(post.created)}</span>
             </div>
             <div class="detail-hits" id="LAY_jieAdmin" data-id="${post.id}">
-              <span class="layui-btn layui-btn-xs jie-admin" type="edit"><a href="add.html">编辑此贴</a></span>
+              <span class="layui-btn layui-btn-xs jie-admin" type="edit"><a href="/post/edit?id=${post.id}">编辑此贴</a></span>
             </div>
           </div>
           <div class="detail-body photos">
@@ -112,4 +112,17 @@
       <#include "/inc/right.ftl">
     </div>
   </div>
+  <script>
+    layui.cache.page = 'jie';
+    $(function () {
+      layui.use(['fly', 'face'], function() {
+        var fly = layui.fly;
+        $('.detail-body').each(function(){
+          var othis = $(this), html = othis.html();
+          othis.html(fly.content(html));
+        });
+      });
+    });
+
+  </script>
 </@layout>

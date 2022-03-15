@@ -19,7 +19,6 @@ import lombok.experimental.Accessors;
 public class MCategory extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
     /**
      * 标题
      */

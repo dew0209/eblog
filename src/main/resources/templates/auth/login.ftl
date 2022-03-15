@@ -57,4 +57,5 @@
       this.src = "/kapthca.jpg"
     });
   </script>
+  <script src="/res/mods/index.js"></script>
 </@layout>

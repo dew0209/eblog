@@ -2,10 +2,7 @@ package com.example.eblog.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.eblog.entity.MUserMessage;
-import com.example.eblog.service.MCommentService;
-import com.example.eblog.service.MPostService;
-import com.example.eblog.service.MUserMessageService;
-import com.example.eblog.service.MUserService;
+import com.example.eblog.service.*;
 import com.example.eblog.shiro.AccountProfile;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 public class BaseController {
     @Autowired
     HttpServletRequest req;
+    @Autowired
+    MCategoryService categoryService;
+    @Autowired
+    MUserCollectionService collectionService;
     @Autowired
     MUserMessageService messageService;
     @Autowired
