@@ -4,13 +4,12 @@ import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.example.eblog.common.lang.Result;
-import com.example.eblog.entity.MCategory;
-import com.example.eblog.entity.MPost;
-import com.example.eblog.entity.MUserCollection;
+import com.example.eblog.entity.*;
 import com.example.eblog.util.ValidationUtil;
 import com.example.eblog.vo.MCommentVo;
 import com.example.eblog.vo.MPostVo;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.ServletRequestUtils;
@@ -134,5 +133,88 @@ public class PostController extends BaseController{
 
         return Result.success().action("/post/" + post.getId());
     }
+    @ResponseBody
+    @Transactional
+    @PostMapping("/post/delete")
+    public Result delete(Long id) {
+        MPost post = postService.getById(id);
+
+        Assert.notNull(post, "该帖子已被删除");
+        Assert.isTrue(post.getUserId().longValue() == getProFileId().longValue(), "无权限删除此文章！");
+
+        postService.removeById(id);
+
+        // 删除相关消息、收藏等
+        messageService.removeByMap(MapUtil.of("post_id", id));
+        collectionService.removeByMap(MapUtil.of("post_id", id));
+
+        return Result.success().action("/user/index");
+    }
+    @ResponseBody
+    @Transactional
+    @PostMapping("/post/reply/")
+    public Result reply(Long jid,String content) {
+
+        Assert.notNull(jid,"找不到对应的文章");
+        Assert.hasLength(content,"评论内容不能为空");
+        MPost post = postService.getById(jid);
+        MComment comment = new MComment();
+        comment.setPostId(jid);
+        comment.setContent(content);
+        comment.setUserId(getProFileId());
+        comment.setCreated(new Date());
+        comment.setModified(new Date());
+        comment.setLevel(0);
+        comment.setVoteDown(0);
+        comment.setVoteUp(0);
+        commentService.save(comment);
+
+        post.setCommentCount(post.getCommentCount() + 1);
+        postService.updateById(post);
+
+        post.setCommentCount(post.getCommentCount() + 1);
+        postService.updateById(post);
+
+        if(comment.getUserId() != post.getUserId()) {
+            MUserMessage message = new MUserMessage();
+            message.setPostId(jid);
+            message.setCommentId(comment.getId());
+            message.setFromUserId(getProFileId());
+            message.setToUserId(post.getUserId());
+            message.setType(1);
+            message.setContent(content);
+            message.setCreated(new Date());
+            message.setStatus(0);
+            messageService.save(message);
+
+            // 即时通知作者（websocket）
+            wsService.sendMessCountToUser(message.getToUserId());
+        }
+
+        // 通知被@的人，有人回复了你的文章
+        if(content.startsWith("@")) {
+            String username = content.substring(1, content.indexOf(" "));
+            System.out.println(username);
+
+            MUser user = userService.getOne(new QueryWrapper<MUser>().eq("username", username));
+            if(user != null) {
+                MUserMessage message = new MUserMessage();
+                message.setPostId(jid);
+                message.setCommentId(comment.getId());
+                message.setFromUserId(getProFileId());
+                message.setToUserId(user.getId());
+                message.setType(2);
+                message.setContent(content);
+                message.setCreated(new Date());
+                message.setStatus(0);
+                messageService.save(message);
+
+                // 即时通知被@的用户
+            }
+        }
+
+        return Result.success().action("/post/" + jid);
+    }
+
 
 }

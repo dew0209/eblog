@@ -14,6 +14,8 @@ public class BaseController {
     @Autowired
     HttpServletRequest req;
     @Autowired
+    WsService wsService;
+    @Autowired
     MCategoryService categoryService;
     @Autowired
     MUserCollectionService collectionService;

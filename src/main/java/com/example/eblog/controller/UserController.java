@@ -12,12 +12,14 @@ import com.example.eblog.entity.MUser;
 import com.example.eblog.entity.MUserMessage;
 import com.example.eblog.shiro.AccountProfile;
 import com.example.eblog.util.UploadUtil;
+import com.example.eblog.vo.MUserMessageVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -124,10 +126,17 @@ public class UserController extends BaseController {
     }
     @GetMapping("/user/mess")
     public String mess(){
-        IPage page = messageService.paging(getPage(), new QueryWrapper<MUserMessage>()
+        IPage<MUserMessageVo> page = messageService.paging(getPage(), new QueryWrapper<MUserMessage>()
                 .eq("to_user_id", getProFileId())
                 .orderByDesc("created")
         );
+        List<Long> ids = new ArrayList<>();
+        for(MUserMessageVo messageVo : page.getRecords()){
+            if(messageVo.getStatus() == 0){
+                ids.add(messageVo.getId());
+            }
+        }
+        messageService.updateToReaded(ids);
         req.setAttribute("pageData",page);
         return "/user/mess";
     }

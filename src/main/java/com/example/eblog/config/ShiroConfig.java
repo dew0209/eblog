@@ -17,6 +17,7 @@ import java.util.Map;
 @Slf4j
 @Configuration
 public class ShiroConfig {
+
     @Bean
     public SecurityManager securityManager(AccountRealm accountRealm){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
@@ -44,6 +45,7 @@ public class ShiroConfig {
         hashMap.put("/collection/find", "auth");
         hashMap.put("/collection/add", "auth");
         hashMap.put("/collection/remove", "auth");
+
         filterFactoryBean.setFilterChainDefinitionMap(hashMap);
 
         return filterFactoryBean;

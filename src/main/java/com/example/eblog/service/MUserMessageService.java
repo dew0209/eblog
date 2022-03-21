@@ -8,6 +8,8 @@ import com.example.eblog.entity.MUserMessage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -19,4 +21,6 @@ import org.apache.ibatis.annotations.Param;
 public interface MUserMessageService extends IService<MUserMessage> {
 
     IPage paging(Page page, @Param(Constants.WRAPPER)QueryWrapper<MUserMessage> wrapper);
+
+    void updateToReaded(List<Long> ids);
 }

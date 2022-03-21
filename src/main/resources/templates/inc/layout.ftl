@@ -10,7 +10,10 @@
   <script src="/res/js/jquery-3.6.0.min.js"></script>
   <link rel="stylesheet" href="/res/layui/css/layui.css">
   <link rel="stylesheet" href="/res/css/global.css">
+
   <script src="/res/layui/layui.js"></script>
+  <script src="/res/js/sockjs.js"></script>
+  <script src="/res/js/stomp.js"></script>
   <style>
     .currentCategoryPage{
       color: #5FB878;
@@ -38,6 +41,38 @@
   }).extend({
     fly: 'index'
   }).use('fly');
+</script>
+<script>
+  $(function () {
+    function showTips(count) {
+      var msg = $('<a class="fly-nav-msg" href="javascript:;">'+ count +'</a>');
+      var elemUser = $('.fly-nav-user');
+      elemUser.append(msg);
+      msg.on('click', function(){
+        location.href = "/user/mess";
+      });
+      layer.tips('你有 '+ count +' 条未读消息', msg, {
+        tips: 3
+        ,tipsMore: true
+        ,fixed: true
+      });
+      msg.on('mouseenter', function(){
+        layer.closeAll('tips');
+      })
+    }
+    var elemUser = $('.fly-nav-user');
+    if(layui.cache.user.uid !== -1 && elemUser[0]){
+      var socket = new SockJS("/websocket");
+      var stompClient = Stomp.over(socket);
+      stompClient.connect({},function (frame) {
+        stompClient.subscribe("/user/" + ${profile.id} + "/messCount",function (res) {
+          console.log(res);
+          // 弹窗
+          showTips(res.body);
+        });
+      });
+    }
+  });
 </script>
 </body>
 </html>

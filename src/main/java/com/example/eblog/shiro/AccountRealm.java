@@ -4,6 +4,7 @@ import com.example.eblog.service.MUserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,14 @@ public class AccountRealm extends AuthorizingRealm {
     @Autowired
     MUserService userService;
     @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+
+        AccountProfile profile = (AccountProfile)principals.getPrimaryPrincipal();
+        if(profile.getId() == 6){
+            SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+            info.addRole("admin");
+            return info;
+        }
         return null;
     }
 
